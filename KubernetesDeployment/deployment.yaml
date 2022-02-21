@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tasks-app-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+        app: tasks-app
+  template:
+    metadata:
+      labels:
+        app: tasks-app
+    spec:
+      containers:
+      - name: dineshtaskskub
+        image: dineshtasks
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8200
+          name: tasks-app
+        env:         
+        - name: ConnectionStrings__DefaultConnection
+          value: "Server=mssql-service;Database=Tasks;uid=sa;pwd=dinesh#01;MultipleActiveResultSets=true"
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: tasks-app-svc
+spec:
+  selector:
+    app: tasks-app
+  type: LoadBalancer
+  ports:
+  - port: 8099
+    targetPort: 80    
+
